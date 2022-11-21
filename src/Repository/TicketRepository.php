@@ -9,58 +9,31 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends ServiceEntityRepository<Ticket>
  *
- * @method Ticket|null find($id, $lockMode = null, $lockVersion = null)
- * @method Ticket|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Ticket|null find($id, $lockMode = NULL, $lockVersion = NULL)
+ * @method Ticket|null findOneBy(array $criteria, array $orderBy = NULL)
  * @method Ticket[]    findAll()
- * @method Ticket[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Ticket[]    findBy(array $criteria, array $orderBy = NULL, $limit = NULL, $offset = NULL)
  */
-class TicketRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Ticket::class);
+class TicketRepository extends ServiceEntityRepository {
+
+  public function __construct(ManagerRegistry $registry) {
+    parent::__construct($registry, Ticket::class);
+  }
+
+  public function save(Ticket $entity, bool $flush = FALSE): void {
+    $this->getEntityManager()->persist($entity);
+
+    if ($flush) {
+      $this->getEntityManager()->flush();
     }
+  }
 
-    public function save(Ticket $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
+  public function remove(Ticket $entity, bool $flush = FALSE): void {
+    $this->getEntityManager()->remove($entity);
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+    if ($flush) {
+      $this->getEntityManager()->flush();
     }
+  }
 
-    public function remove(Ticket $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-//    /**
-//     * @return Ticket[] Returns an array of Ticket objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Ticket
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
