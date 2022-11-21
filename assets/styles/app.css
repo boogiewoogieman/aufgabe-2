@@ -1,0 +1,16 @@
+body {
+    background-color: lightgray;
+}
+
+.events-list, .tickets-list {
+    list-style: none;
+}
+
+.events-list li,
+.tickets-list li {
+    display: inline-block;
+    margin: 10px;
+    border: 1px solid black;
+    padding-left: 10px;
+    padding-right: 10px;
+}

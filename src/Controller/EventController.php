@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +29,7 @@ class EventController extends AbstractController {
 
     $event = new Event();
     $event->setTitle($data['title']);
-    $event->setDate(new \DateTime($data['date']));
+    $event->setDate(new DateTime($data['date']));
     $event->setCity($data['city']);
     $eventRepository->save($event, TRUE);
 
@@ -50,7 +51,7 @@ class EventController extends AbstractController {
     return [
       'id' => $event->getId(),
       'title' => $event->getTitle(),
-      'date' => $event->getDate(),
+      'date' => $event->getDate()->format('Y-m-d'),
       'city' => $event->getCity(),
     ];
   }

@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class TicketController extends AbstractController {
 
@@ -48,11 +49,14 @@ class TicketController extends AbstractController {
   }
 
   private function formatTicket(Ticket $ticket): array {
+    $generator = new BarcodeGeneratorPNG();
+
     return [
       'id' => $ticket->getId(),
       'barcodeString' => $ticket->getBarcode(),
-      // todo: generate barcode image
-      //          'barcodeString' => $ticket->getBarcode(),
+      // generate barcode image
+      // todo: Cache this for improved performance
+      'barcodeImage' => base64_encode($generator->getBarcode($ticket->getBarcode(), $generator::TYPE_CODE_128)),
       'firstName' => $ticket->getFirstName(),
       'lastName' => $ticket->getLastName(),
     ];

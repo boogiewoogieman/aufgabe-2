@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -20,7 +21,7 @@ class Event {
   private ?string $title = NULL;
 
   #[ORM\Column(type: Types::DATE_MUTABLE)]
-  private ?\DateTimeInterface $date = NULL;
+  private ?DateTimeInterface $date = NULL;
 
   #[ORM\Column(length: 255)]
   private ?string $city = NULL;
@@ -46,11 +47,11 @@ class Event {
     return $this;
   }
 
-  public function getDate(): ?\DateTimeInterface {
+  public function getDate(): ?DateTimeInterface {
     return $this->date;
   }
 
-  public function setDate(\DateTimeInterface $date): self {
+  public function setDate(DateTimeInterface $date): self {
     $this->date = $date;
 
     return $this;
