@@ -27,10 +27,30 @@ class TicketController extends AbstractController {
   public function create(Request $request, TicketRepository $ticketRepository, EventRepository $eventRepository): JsonResponse {
     $data = json_decode($request->getContent(), TRUE);
 
+    $firstName = $data['firstName'];
+    $lastName = $data['lastName'];
+    $eventId = $data['eventId'];
+
+    $error = NULL;
+
+    if (empty($firstName)) {
+      $error = 'First name is empty';
+    }
+    elseif (empty($lastName)) {
+      $error = 'Last name is empty';
+    }
+    elseif (empty($eventId)) {
+      $error = 'No event selected';
+    }
+
+    if ($error) {
+      return $this->json(['error' => $error]);
+    }
+
     $ticket = new Ticket();
-    $ticket->setFirstName($data['firstName']);
-    $ticket->setLastName($data['lastName']);
-    $ticket->setEvent($eventRepository->find($data['eventId']));
+    $ticket->setFirstName($firstName);
+    $ticket->setLastName($lastName);
+    $ticket->setEvent($eventRepository->find($eventId));
     $ticketRepository->save($ticket, TRUE);
 
     return $this->json(['ticketId' => $ticket->getId()]);

@@ -17,7 +17,7 @@ export default class extends Controller {
   }
 
   displayError(error) {
-    this.errorTarget.textContent = error;
+    this.errorTarget.textContent = `Error: ${error}`;
   }
 
   submit() {

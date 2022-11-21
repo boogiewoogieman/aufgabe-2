@@ -27,13 +27,34 @@ class EventController extends AbstractController {
   public function create(Request $request, EventRepository $eventRepository): JsonResponse {
     $data = json_decode($request->getContent(), TRUE);
 
+    $title = $data['title'];
+    $date = $data['date'];
+    $city = $data['city'];
+
+    $error = NULL;
+
+    if (empty($title)) {
+      $error = 'Title is empty';
+    }
+    elseif (empty($date)) {
+      $error = 'Date is empty';
+    }
+    elseif (empty($city)) {
+      $error = 'City is empty';
+    }
+
+    if ($error) {
+      return $this->json(['error' => $error]);
+    }
+
     $event = new Event();
-    $event->setTitle($data['title']);
-    $event->setDate(new DateTime($data['date']));
-    $event->setCity($data['city']);
+
+    $event->setTitle($title);
+    $event->setDate(new DateTime($date));
+    $event->setCity($city);
     $eventRepository->save($event, TRUE);
 
-    return $this->json(['eventId' => $event->getId(),]);
+    return $this->json(['eventId' => $event->getId()]);
   }
 
   #[Route('/event/{id}', name: 'app_event_show', methods: 'GET')]

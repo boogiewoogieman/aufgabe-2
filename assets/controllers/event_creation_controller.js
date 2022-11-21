@@ -6,7 +6,7 @@ export default class extends Controller {
   static targets = ['title', 'date', 'city', 'error'];
 
   displayError(error) {
-    this.errorTarget.textContent = error;
+    this.errorTarget.textContent = `Error: ${error}`;
   }
 
   submit() {

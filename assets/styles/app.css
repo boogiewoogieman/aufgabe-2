@@ -18,3 +18,8 @@ body {
 .ticket--barcode {
     text-align: center;
 }
+
+.error {
+    color: #dd0b0b;
+    font-weight: bold;
+}
