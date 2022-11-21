@@ -2,31 +2,60 @@
 
 namespace App\Controller;
 
+use App\Entity\Ticket;
+use App\Repository\EventRepository;
+use App\Repository\TicketRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TicketController extends AbstractController {
 
   #[Route('/ticket/list', name: 'app_ticket_list', methods: 'GET')]
-  public function list(): JsonResponse {
-    // todo: implement
+  public function list(TicketRepository $ticketRepository): JsonResponse {
+    $tickets = $ticketRepository->findAll();
 
-    return $this->json([]);
+    return $this->json([
+      'result' => array_map(function ($ticket) {
+        return $this->formatTicket($ticket);
+      }, $tickets),
+    ]);
   }
 
   #[Route('/ticket/create', name: 'app_ticket_create', methods: 'POST')]
-  public function create(): JsonResponse {
-    // todo: implement
+  public function create(Request $request, TicketRepository $ticketRepository, EventRepository $eventRepository): JsonResponse {
+    $data = json_decode($request->getContent(), TRUE);
 
-    return $this->json([]);
+    $ticket = new Ticket();
+    $ticket->setFirstName($data['firstName']);
+    $ticket->setLastName($data['lastName']);
+    $ticket->setEvent($eventRepository->find($data['eventId']));
+    $ticketRepository->save($ticket, TRUE);
+
+    return $this->json([
+      'ticketId' => $ticket->getId(),
+    ]);
   }
 
   #[Route('/ticket/{id}', name: 'app_ticket_show', methods: 'GET')]
-  public function show(int $id): JsonResponse {
-    // todo: implement
+  public function show($id, TicketRepository $ticketRepository): JsonResponse {
+    $ticket = $ticketRepository->find($id);
 
-    return $this->json([]);
+    return $this->json([
+      'result' => $this->formatTicket($ticket),
+    ]);
+  }
+
+  private function formatTicket(Ticket $ticket): array {
+    return [
+      'id' => $ticket->getId(),
+      'barcodeString' => $ticket->getBarcode(),
+      // todo: generate barcode image
+      //          'barcodeString' => $ticket->getBarcode(),
+      'firstName' => $ticket->getFirstName(),
+      'lastName' => $ticket->getLastName(),
+    ];
   }
 
 }

@@ -17,12 +17,7 @@ class EventController extends AbstractController {
 
     return $this->json([
       'result' => array_map(function ($event) {
-        return [
-          'id' => $event->getId(),
-          'title' => $event->getTitle(),
-          'date' => $event->getDate(),
-          'city' => $event->getCity(),
-        ];
+        return $this->formatEvent($event);
       }, $events),
     ]);
   }
@@ -47,13 +42,17 @@ class EventController extends AbstractController {
     $event = $eventRepository->find($id);
 
     return $this->json([
-      'result' => [
-        'id' => $event->getId(),
-        'title' => $event->getTitle(),
-        'date' => $event->getDate(),
-        'city' => $event->getCity(),
-      ],
+      'result' => $this->formatEvent($event),
     ]);
+  }
+
+  private function formatEvent(Event $event): array {
+    return [
+      'id' => $event->getId(),
+      'title' => $event->getTitle(),
+      'date' => $event->getDate(),
+      'city' => $event->getCity(),
+    ];
   }
 
 }

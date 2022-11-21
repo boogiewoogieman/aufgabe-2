@@ -4,15 +4,29 @@ namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class EventTest extends WebTestCase {
+class TicketTest extends WebTestCase {
 
-  public function testCreateEventAndRetrieveInfo(): void {
+  public function testCreateTicketAndRetrieveInfo(): void {
     $client = static::createClient();
+
+    // 1. create event
 
     $client->jsonRequest('POST', '/event/create', [
       'title' => 'Christmas',
       'date' => '2022-12-24',
       'city' => 'Christmas Town',
+    ]);
+    $this->assertResponseIsSuccessful();
+    $response = $client->getResponse();
+    $content = $response->getContent();
+    $result = json_decode($content, TRUE);
+
+    // 2. create ticket
+
+    $client->jsonRequest('POST', '/ticket/create', [
+      'firstName' => 'Santa',
+      'lastName' => 'Claus',
+      'eventId' => $result['eventId'],
     ]);
     $this->assertResponseIsSuccessful();
 
@@ -23,11 +37,11 @@ class EventTest extends WebTestCase {
 
     $result = json_decode($content, TRUE);
 
-    $this->assertArrayHasKey('eventId', $result);
+    $this->assertArrayHasKey('ticketId', $result);
 
-    // get saved information
+    // 3. retrieve ticket info
 
-    $client->jsonRequest('GET', '/event/' . $result['eventId']);
+    $client->jsonRequest('GET', '/ticket/' . $result['ticketId']);
     $this->assertResponseIsSuccessful();
 
     $response = $client->getResponse();
@@ -39,14 +53,14 @@ class EventTest extends WebTestCase {
 
     $this->assertArrayHasKey('result', $result);
     $this->assertArrayHasKey('id', $result['result']);
-    $this->assertArrayHasKey('title', $result['result']);
-    $this->assertArrayHasKey('date', $result['result']);
-    $this->assertArrayHasKey('city', $result['result']);
+    $this->assertArrayHasKey('barcodeString', $result['result']);
+    $this->assertArrayHasKey('firstName', $result['result']);
+    $this->assertArrayHasKey('lastName', $result['result']);
   }
 
-  public function testListEvents(): void {
+  public function testListTickets(): void {
     $client = static::createClient();
-    $client->jsonRequest('GET', '/event/list');
+    $client->jsonRequest('GET', '/ticket/list');
     $response = $client->getResponse();
 
     $this->assertResponseIsSuccessful();
