@@ -4,7 +4,15 @@
     <div>
         <h2>Events:</h2>
         <div data-controller="events-list"></div>
-        <div data-controller="event-creation"></div>
+        <form data-controller="event-creation">
+            <fieldset>
+                <legend>Create new event</legend>
+                <p><label>Title: <input data-event-creation-target="title"/></label></p>
+                <p><label>Date: <input data-event-creation-target="date" type="date"/></label></p>
+                <p><label>City: <input data-event-creation-target="city"/></label></p>
+                <button type="button" data-action="event-creation#submit">Submit</button>
+            </fieldset>
+        </form>
     </div>
     <div>
         <h2>Tickets:</h2>
