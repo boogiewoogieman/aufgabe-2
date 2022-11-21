@@ -8,6 +8,7 @@ class EventTest extends WebTestCase {
 
   public function testCreateEvent(): void {
     $client = static::createClient();
+
     $client->jsonRequest('POST', '/event/create', [
       'title' => 'Christmas',
       'date' => '2022-12-24 12:00:00Z+1',
@@ -16,7 +17,6 @@ class EventTest extends WebTestCase {
     $this->assertResponseIsSuccessful();
 
     $response = $client->getResponse();
-
     $content = $response->getContent();
 
     $this->assertJson($content);
@@ -24,6 +24,16 @@ class EventTest extends WebTestCase {
     $result = json_decode($content, true);
 
     $this->assertArrayHasKey('eventId', $result);
+
+    // get saved information
+
+    $client->jsonRequest('GET', '/event/'.$result['eventId']);
+    $this->assertResponseIsSuccessful();
+
+    $response = $client->getResponse();
+    $content = $response->getContent();
+
+    $this->assertJson($content);
   }
 
   public function testListEvents(): void {
