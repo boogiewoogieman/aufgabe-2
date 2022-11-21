@@ -7,6 +7,7 @@
         <form data-controller="event-creation">
             <fieldset>
                 <legend>Create new event</legend>
+                <div data-event-creation-target="error"></div>
                 <p><label>Title: <input data-event-creation-target="title"/></label></p>
                 <p><label>Date: <input data-event-creation-target="date" type="date"/></label></p>
                 <p><label>City: <input data-event-creation-target="city"/></label></p>
@@ -17,6 +18,15 @@
     <div>
         <h2>Tickets:</h2>
         <div data-controller="tickets-list"></div>
-        <div data-controller="ticket-creation"></div>
+        <form data-controller="ticket-creation">
+            <fieldset>
+                <legend>Create new ticket</legend>
+                <div data-ticket-creation-target="error"></div>
+                <p><label>First name: <input data-ticket-creation-target="firstName"/></label></p>
+                <p><label>Last name: <input data-ticket-creation-target="lastName"/></label></p>
+                <p><label>Event: <select data-ticket-creation-target="eventId"></select></label></p>
+                <button type="button" data-action="ticket-creation#submit">Submit</button>
+            </fieldset>
+        </form>
     </div>
 {% endblock %}

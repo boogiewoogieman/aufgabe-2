@@ -1,12 +1,12 @@
 import {Controller} from '@hotwired/stimulus';
 
-const EVENTS_LIST_URL = '/event/list';
+const URL = '/event/list';
 
 export default class extends Controller {
 
   connect() {
     // load and display events list
-    fetch(EVENTS_LIST_URL).then(r => r.json()).then(r => {
+    fetch(URL).then(r => r.json()).then(r => {
       this.element.innerHTML =
           `<ul class="events-list">${r.result.map(event => {
             const date = new Date(event.date);

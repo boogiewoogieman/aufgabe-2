@@ -1,6 +1,6 @@
 import {Controller} from '@hotwired/stimulus';
 
-const EVENT_CREATION_URL = '/event/create';
+const URL = '/event/create';
 
 export default class extends Controller {
   static targets = ['title', 'date', 'city', 'error'];
@@ -12,7 +12,7 @@ export default class extends Controller {
   submit() {
     this.errorTarget.textContent = '';
 
-    fetch(EVENT_CREATION_URL, {
+    fetch(URL, {
       method: 'POST',
       body: JSON.stringify({
         title: this.titleTarget.value,
@@ -25,11 +25,12 @@ export default class extends Controller {
         return;
       }
 
-      // reload events list
-      const eventsListController = this.application.controllers.find(
-          controller => controller.identifier == 'events-list');
-      eventsListController.disconnect();
-      eventsListController.connect();
+      // reload other controllers
+      for (const identifier of ['events-list', 'ticket-creation']) {
+        const controller = this.application.controllers.find(controller => controller.identifier == identifier);
+        controller.disconnect();
+        controller.connect();
+      }
 
       // reset form
       this.titleTarget.value = null;
