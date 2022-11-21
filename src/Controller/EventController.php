@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Event;
+use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class EventController extends AbstractController {
@@ -16,10 +19,18 @@ class EventController extends AbstractController {
   }
 
   #[Route('/event/create', name: 'app_event_create', methods: 'POST')]
-  public function create(): JsonResponse {
-    // todo: implement
+  public function create(Request $request, EventRepository $eventRepository): JsonResponse {
+    $data = json_decode($request->getContent(), TRUE);
 
-    return $this->json([]);
+    $event = new Event();
+    $event->setTitle($data['title']);
+    $event->setDate(new \DateTime($data['date']));
+    $event->setCity($data['city']);
+    $eventRepository->save($event, TRUE);
+
+    return $this->json([
+      'eventId' => $event->getId(),
+    ]);
   }
 
   #[Route('/event/{id}', name: 'app_event_show', methods: 'GET')]
