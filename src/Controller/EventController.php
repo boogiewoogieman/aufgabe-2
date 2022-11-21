@@ -18,7 +18,7 @@ class EventController extends AbstractController {
 
     return $this->json([
       'result' => array_map(function ($event) {
-        return $this->formatEvent($event);
+        return $event->formatForOutput();
       }, $events),
     ]);
   }
@@ -33,27 +33,14 @@ class EventController extends AbstractController {
     $event->setCity($data['city']);
     $eventRepository->save($event, TRUE);
 
-    return $this->json([
-      'eventId' => $event->getId(),
-    ]);
+    return $this->json(['eventId' => $event->getId(),]);
   }
 
   #[Route('/event/{id}', name: 'app_event_show', methods: 'GET')]
   public function show($id, EventRepository $eventRepository): JsonResponse {
     $event = $eventRepository->find($id);
 
-    return $this->json([
-      'result' => $this->formatEvent($event),
-    ]);
-  }
-
-  private function formatEvent(Event $event): array {
-    return [
-      'id' => $event->getId(),
-      'title' => $event->getTitle(),
-      'date' => $event->getDate()->format('Y-m-d'),
-      'city' => $event->getCity(),
-    ];
+    return $this->json(['result' => $event->formatForOutput()]);
   }
 
 }

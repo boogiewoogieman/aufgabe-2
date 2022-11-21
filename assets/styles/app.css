@@ -14,3 +14,7 @@ body {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+.ticket--barcode {
+    text-align: center;
+}

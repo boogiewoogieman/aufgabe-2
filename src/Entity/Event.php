@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Picqer\Barcode\BarcodeGenerator;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event {
@@ -92,6 +94,15 @@ class Event {
     }
 
     return $this;
+  }
+
+  public function formatForOutput(): array {
+    return [
+      'id' => $this->getId(),
+      'title' => $this->getTitle(),
+      'date' => $this->getDate()->format('Y-m-d'),
+      'city' => $this->getCity(),
+    ];
   }
 
 }

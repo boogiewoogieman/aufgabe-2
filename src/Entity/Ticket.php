@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\TicketRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Picqer\Barcode\BarcodeGenerator;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -81,6 +83,21 @@ class Ticket {
     $this->event = $event;
 
     return $this;
+  }
+
+  public function formatForOutput(): array {
+    $barcodeGenerator = new BarcodeGeneratorPNG();
+
+    return [
+      'id' => $this->getId(),
+      'barcodeString' => $this->getBarcode(),
+      // generate barcode image
+      // Note: This should be cached for improved performance
+      'barcodeImage' => base64_encode($barcodeGenerator->getBarcode($this->getBarcode(), BarcodeGenerator::TYPE_CODE_128)),
+      'firstName' => $this->getFirstName(),
+      'lastName' => $this->getLastName(),
+      'event' => $this->getEvent()->formatForOutput(),
+    ];
   }
 
 }

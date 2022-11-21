@@ -9,7 +9,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class TicketController extends AbstractController {
 
@@ -19,7 +18,7 @@ class TicketController extends AbstractController {
 
     return $this->json([
       'result' => array_map(function ($ticket) {
-        return $this->formatTicket($ticket);
+        return $ticket->formatForOutput();
       }, $tickets),
     ]);
   }
@@ -34,32 +33,14 @@ class TicketController extends AbstractController {
     $ticket->setEvent($eventRepository->find($data['eventId']));
     $ticketRepository->save($ticket, TRUE);
 
-    return $this->json([
-      'ticketId' => $ticket->getId(),
-    ]);
+    return $this->json(['ticketId' => $ticket->getId()]);
   }
 
   #[Route('/ticket/{id}', name: 'app_ticket_show', methods: 'GET')]
   public function show($id, TicketRepository $ticketRepository): JsonResponse {
     $ticket = $ticketRepository->find($id);
 
-    return $this->json([
-      'result' => $this->formatTicket($ticket),
-    ]);
-  }
-
-  private function formatTicket(Ticket $ticket): array {
-    $generator = new BarcodeGeneratorPNG();
-
-    return [
-      'id' => $ticket->getId(),
-      'barcodeString' => $ticket->getBarcode(),
-      // generate barcode image
-      // todo: Cache this for improved performance
-      'barcodeImage' => base64_encode($generator->getBarcode($ticket->getBarcode(), $generator::TYPE_CODE_128)),
-      'firstName' => $ticket->getFirstName(),
-      'lastName' => $ticket->getLastName(),
-    ];
+    return $this->json(['result' => $ticket->formatForOutput(),]);
   }
 
 }
