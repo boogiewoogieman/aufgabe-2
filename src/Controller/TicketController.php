@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Ticket;
 use App\Repository\EventRepository;
 use App\Repository\TicketRepository;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,15 +17,18 @@ class TicketController extends AbstractController {
   #[Route('/ticket/list', name: 'app_ticket_list', methods: 'GET')]
   public function list(TicketRepository $ticketRepository): JsonResponse {
     $tickets = $ticketRepository->findAll();
-
-    return $this->json([
-      'result' => array_map(function ($ticket) {
-        return [
-          ...$ticket->toArray(),
-          'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
-        ];
-      }, $tickets),
-    ]);
+    try {
+      return $this->json([
+        'result' => array_map(function ($ticket) {
+          return [
+            ...$ticket->toArray(),
+            'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
+          ];
+        }, $tickets),
+      ]);
+    } catch (Exception $e) {
+      return $this->json(['error' => $e->getMessage()], 500);
+    }
   }
 
   #[Route('/ticket/create', name: 'app_ticket_create', methods: 'POST')]
@@ -49,15 +53,18 @@ class TicketController extends AbstractController {
   #[Route('/ticket/{id}', name: 'app_ticket_show', methods: 'GET')]
   public function show($id, TicketRepository $ticketRepository): JsonResponse {
     $ticket = $ticketRepository->find($id);
-
-    return $this->json([
-      'result' => [
-        ...$ticket->toArray(),
-        // generate barcode image
-        // Note: This should be cached for improved performance
-        'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
-      ],
-    ]);
+    try {
+      return $this->json([
+        'result' => [
+          ...$ticket->toArray(),
+          // generate barcode image
+          // Note: This should be cached for improved performance
+          'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
+        ],
+      ]);
+    } catch (Exception $e) {
+      return $this->json(['error' => $e->getMessage()], 500);
+    }
   }
 
 }

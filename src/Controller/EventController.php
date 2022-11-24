@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,11 @@ class EventController extends AbstractController {
   #[Route('/event/create', name: 'app_event_create', methods: 'POST')]
   public function create(Request $request, EventRepository $eventRepository, ValidatorInterface $validator): JsonResponse {
     $data = json_decode($request->getContent(), TRUE);
-    $event = Event::fromArray($data);
+    try {
+      $event = Event::fromArray($data);
+    } catch (Exception $e) {
+      return $this->json(['error' => $e->getMessage()], 500);
+    }
 
     $errors = $validator->validate($event);
     if (count($errors)) {

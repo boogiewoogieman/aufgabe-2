@@ -87,6 +87,9 @@ class Ticket {
     return $barcodeGenerator->getBarcode($this->getBarcode(), BarcodeGenerator::TYPE_CODE_128);
   }
 
+  /**
+   * @throws \Exception
+   */
   #[ORM\PrePersist]
   public function preSave(): void {
     // Generate barcode value
