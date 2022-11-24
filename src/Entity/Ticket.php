@@ -92,7 +92,8 @@ class Ticket {
     // Generate barcode value
     // We divide max length by 2 because we will save the barcode as a hex string
     // Duplications cannot be ruled out. Therefore a better generation method
-    // should be implemented in the future. For now, at least the column is marked as unique.
+    // should be implemented in the future (or the max length should be increased).
+    // For now, at least the column is marked as unique.
     $data = random_bytes(self::BARCODE_MAX_LENGTH / 2);
     $this->barcode = bin2hex($data);
   }
