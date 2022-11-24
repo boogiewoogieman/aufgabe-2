@@ -11,7 +11,7 @@ export default class extends Controller {
           `<ul class="tickets-list">${r.result.map(ticket => {
             return `
               <li>
-                <p><strong>Event:</strong> ${ticket.event.title} (${ticket.event.date})</p>
+                <p><strong>Event:</strong> ${ticket.event.title} (${ticket.event.date}), ${ticket.event.city}</p>
                 <p><strong>First name:</strong> ${ticket.firstName}</p>
                 <p><strong>Last name:</strong> ${ticket.lastName}</p>
                 <div class="ticket--barcode">
