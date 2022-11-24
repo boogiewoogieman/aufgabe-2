@@ -23,11 +23,13 @@ class TicketTest extends WebTestCase {
 
     // 2. create ticket
 
-    $client->jsonRequest('POST', '/ticket/create', [
+    $ticket = [
       'firstName' => 'Santa',
       'lastName' => 'Claus',
       'eventId' => $result['eventId'],
-    ]);
+    ];
+
+    $client->jsonRequest('POST', '/ticket/create', $ticket);
     $this->assertResponseIsSuccessful();
 
     $response = $client->getResponse();
@@ -55,7 +57,9 @@ class TicketTest extends WebTestCase {
     $this->assertArrayHasKey('id', $result['result']);
     $this->assertArrayHasKey('barcodeString', $result['result']);
     $this->assertArrayHasKey('firstName', $result['result']);
+    $this->assertEquals($ticket['firstName'],$result['result']['firstName']);
     $this->assertArrayHasKey('lastName', $result['result']);
+    $this->assertEquals($ticket['lastName'],$result['result']['lastName']);
   }
 
   public function testListTickets(): void {

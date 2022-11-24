@@ -9,11 +9,13 @@ class EventTest extends WebTestCase {
   public function testCreateEventAndRetrieveInfo(): void {
     $client = static::createClient();
 
-    $client->jsonRequest('POST', '/event/create', [
+    $event = [
       'title' => 'Christmas',
       'date' => '2022-12-24',
       'city' => 'Christmas Town',
-    ]);
+    ];
+
+    $client->jsonRequest('POST', '/event/create', $event);
     $this->assertResponseIsSuccessful();
 
     $response = $client->getResponse();
@@ -40,8 +42,11 @@ class EventTest extends WebTestCase {
     $this->assertArrayHasKey('result', $result);
     $this->assertArrayHasKey('id', $result['result']);
     $this->assertArrayHasKey('title', $result['result']);
+    $this->assertEquals($event['title'],$result['result']['title']);
     $this->assertArrayHasKey('date', $result['result']);
+    $this->assertEquals($event['date'],$result['result']['date']);
     $this->assertArrayHasKey('city', $result['result']);
+    $this->assertEquals($event['city'],$result['result']['city']);
   }
 
   public function testListEvents(): void {
