@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TicketController extends AbstractController {
 
@@ -18,39 +19,28 @@ class TicketController extends AbstractController {
 
     return $this->json([
       'result' => array_map(function ($ticket) {
-        return $ticket->formatForOutput();
+        return [
+          ...$ticket->toArray(),
+          'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
+        ];
       }, $tickets),
     ]);
   }
 
   #[Route('/ticket/create', name: 'app_ticket_create', methods: 'POST')]
-  public function create(Request $request, TicketRepository $ticketRepository, EventRepository $eventRepository): JsonResponse {
+  public function create(Request $request, TicketRepository $ticketRepository, EventRepository $eventRepository, ValidatorInterface $validator): JsonResponse {
     $data = json_decode($request->getContent(), TRUE);
 
-    $firstName = $data['firstName'];
-    $lastName = $data['lastName'];
-    $eventId = $data['eventId'];
-
-    $error = NULL;
-
-    if (empty($firstName)) {
-      $error = 'First name is empty';
-    }
-    elseif (empty($lastName)) {
-      $error = 'Last name is empty';
-    }
-    elseif (empty($eventId)) {
-      $error = 'No event selected';
+    if (!empty($data['eventId'])) {
+      $data['event'] = $eventRepository->find($data['eventId']);
     }
 
-    if ($error) {
-      return $this->json(['error' => $error]);
+    $ticket = Ticket::fromArray($data);
+    $errors = $validator->validate($ticket);
+    if (count($errors)) {
+      return $this->json(['error' => $errors[0]->getMessage()]);
     }
 
-    $ticket = new Ticket();
-    $ticket->setFirstName($firstName);
-    $ticket->setLastName($lastName);
-    $ticket->setEvent($eventRepository->find($eventId));
     $ticketRepository->save($ticket, TRUE);
 
     return $this->json(['ticketId' => $ticket->getId()]);
@@ -60,7 +50,14 @@ class TicketController extends AbstractController {
   public function show($id, TicketRepository $ticketRepository): JsonResponse {
     $ticket = $ticketRepository->find($id);
 
-    return $this->json(['result' => $ticket->formatForOutput(),]);
+    return $this->json([
+      'result' => [
+        ...$ticket->toArray(),
+        // generate barcode image
+        // Note: This should be cached for improved performance
+        'barcodeImage' => base64_encode($ticket->generateBarcodeImage()),
+      ],
+    ]);
   }
 
 }

@@ -6,6 +6,7 @@ use App\Repository\TicketRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Picqer\Barcode\BarcodeGenerator;
 use Picqer\Barcode\BarcodeGeneratorPNG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -28,14 +29,43 @@ class Ticket {
   private ?string $barcode = NULL;
 
   #[ORM\Column(length: 255)]
+  #[Assert\NotBlank(message: 'First name should not be blank')]
   private ?string $firstName = NULL;
 
   #[ORM\Column(length: 255)]
+  #[Assert\NotBlank(message: 'Last name should not be blank')]
   private ?string $lastName = NULL;
 
   #[ORM\ManyToOne(inversedBy: 'tickets')]
   #[ORM\JoinColumn(nullable: FALSE)]
+  #[Assert\NotBlank(message: 'Event should not be blank')]
   private ?Event $event = NULL;
+
+  static public function fromArray(array $arr): self {
+    $ticket = new self();
+
+    if (isset($arr['firstName'])) {
+      $ticket->setFirstName($arr['firstName']);
+    }
+    if (isset($arr['lastName'])) {
+      $ticket->setLastName($arr['lastName']);
+    }
+    if (isset($arr['event'])) {
+      $ticket->setEvent($arr['event']);
+    }
+
+    return $ticket;
+  }
+
+  public function toArray(): array {
+    return [
+      'id' => $this->getId(),
+      'barcodeString' => $this->getBarcode(),
+      'firstName' => $this->getFirstName(),
+      'lastName' => $this->getLastName(),
+      'event' => $this->getEvent()->toArray(),
+    ];
+  }
 
   public function getId(): ?int {
     return $this->id;
@@ -43,6 +73,18 @@ class Ticket {
 
   public function getBarcode(): ?string {
     return $this->barcode;
+  }
+
+  /**
+   * Generates the barcode image as PNG.
+   * Note: This should be cached for improved performance
+   *
+   * @return string Image data
+   * @throws \Picqer\Barcode\Exceptions\BarcodeException
+   */
+  public function generateBarcodeImage(): string {
+    $barcodeGenerator = new BarcodeGeneratorPNG();
+    return $barcodeGenerator->getBarcode($this->getBarcode(), BarcodeGenerator::TYPE_CODE_128);
   }
 
   #[ORM\PrePersist]
@@ -83,21 +125,6 @@ class Ticket {
     $this->event = $event;
 
     return $this;
-  }
-
-  public function formatForOutput(): array {
-    $barcodeGenerator = new BarcodeGeneratorPNG();
-
-    return [
-      'id' => $this->getId(),
-      'barcodeString' => $this->getBarcode(),
-      // generate barcode image
-      // Note: This should be cached for improved performance
-      'barcodeImage' => base64_encode($barcodeGenerator->getBarcode($this->getBarcode(), BarcodeGenerator::TYPE_CODE_128)),
-      'firstName' => $this->getFirstName(),
-      'lastName' => $this->getLastName(),
-      'event' => $this->getEvent()->formatForOutput(),
-    ];
   }
 
 }

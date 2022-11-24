@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\EventRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Picqer\Barcode\BarcodeGenerator;
-use Picqer\Barcode\BarcodeGeneratorPNG;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event {
@@ -20,12 +20,15 @@ class Event {
   private ?int $id = NULL;
 
   #[ORM\Column(length: 255)]
+  #[Assert\NotBlank(message: 'Title should not be blank')]
   private ?string $title = NULL;
 
   #[ORM\Column(type: Types::DATE_MUTABLE)]
+  #[Assert\NotBlank(message: 'Date should not be blank')]
   private ?DateTimeInterface $date = NULL;
 
   #[ORM\Column(length: 255)]
+  #[Assert\NotBlank(message: 'City should not be blank')]
   private ?string $city = NULL;
 
   #[ORM\OneToMany(mappedBy: 'event', targetEntity: Ticket::class)]
@@ -33,6 +36,37 @@ class Event {
 
   public function __construct() {
     $this->tickets = new ArrayCollection();
+  }
+
+  /**
+   * @throws \Exception
+   */
+  static public function fromArray(array $arr): self {
+    $event = new self();
+    if (isset($arr['title'])) {
+      $event->setTitle($arr['title']);
+    }
+    if (isset($arr['date'])) {
+      if (is_string($arr['date'])) {
+        $event->setDate(new DateTime($arr['date']));
+      }
+      else {
+        $event->setDate($arr['date']);
+      }
+    }
+    if (isset($arr['city'])) {
+      $event->setCity($arr['city']);
+    }
+    return $event;
+  }
+
+  public function toArray(): array {
+    return [
+      'id' => $this->getId(),
+      'title' => $this->getTitle(),
+      'date' => $this->getDate()->format('Y-m-d'),
+      'city' => $this->getCity(),
+    ];
   }
 
   public function getId(): ?int {
@@ -44,7 +78,7 @@ class Event {
   }
 
   public function setTitle(string $title): self {
-    $this->title = $title;
+    $this->title = trim($title);
 
     return $this;
   }
@@ -64,7 +98,7 @@ class Event {
   }
 
   public function setCity(string $city): self {
-    $this->city = $city;
+    $this->city = trim($city);
 
     return $this;
   }
@@ -94,15 +128,6 @@ class Event {
     }
 
     return $this;
-  }
-
-  public function formatForOutput(): array {
-    return [
-      'id' => $this->getId(),
-      'title' => $this->getTitle(),
-      'date' => $this->getDate()->format('Y-m-d'),
-      'city' => $this->getCity(),
-    ];
   }
 
 }
