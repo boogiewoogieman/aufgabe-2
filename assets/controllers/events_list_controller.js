@@ -7,6 +7,12 @@ export default class extends Controller {
   connect() {
     // load and display events list
     fetch(URL).then(r => r.json()).then(r => {
+      if(!r.result.length) {
+        this.element.innerHTML = 'No events yet';
+        return;
+      }
+
+
       this.element.innerHTML =
           `<ul class="events-list">${r.result.map(event => {
             const date = new Date(event.date);

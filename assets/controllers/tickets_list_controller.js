@@ -7,6 +7,11 @@ export default class extends Controller {
   connect() {
     // load and display tickets list
     fetch(URL).then(r => r.json()).then(r => {
+      if(!r.result.length) {
+        this.element.innerHTML = 'No tickets yet';
+        return;
+      }
+
       this.element.innerHTML =
           `<ul class="tickets-list">${r.result.map(ticket => {
             return `
