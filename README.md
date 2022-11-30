@@ -6,22 +6,27 @@ Getting started
 docker-compose up -d
 ```
 
-2. Install dependencies
+2. Create database
+```
+bin/console doctrine:schema:create
+```
+
+3. Install dependencies
 ```
 composer install
 yarn install
 ```
 
-3. Build frontend
+4. Build frontend
 ```
 yarn dev
 ```
 
-4. Start local server
+5. Start local server
 ```
 symfony serve -d
 ```
 
-5. Open frontend in browser
+6. Open frontend in browser
 
 https://localhost:8000
